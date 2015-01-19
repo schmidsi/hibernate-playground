@@ -18,11 +18,19 @@ public class OAuth {
 	
 	public OAuth() {};
 	
-	public OAuth(User _user, OAuthProvider _provider, String _id, String _accessToken) {
-		this.user = _user;
+	public OAuth(OAuthProvider _provider, String _id) {
 		this.provider = _provider;
 		this.providerId = _id;
+	}
+	
+	public OAuth(OAuthProvider _provider, String _id, String _accessToken) {
+		this(_provider, _id);
 		this.accessToken = _accessToken;
+	}
+	
+	public OAuth(User _user, OAuthProvider _provider, String _id, String _accessToken) {
+		this(_provider, _id, _accessToken);
+		this.user = _user;
 	}
 
 	public User getUser() {
@@ -55,5 +63,13 @@ public class OAuth {
 
 	public void setAccessToken(String accessToken) {
 		this.accessToken = accessToken;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 }

@@ -34,6 +34,10 @@ public class User {
 		this.password = _password;
 	}
 	
+	public User(OAuth _oauth) {
+		this.addOAuth(_oauth);
+	}
+	
 	@Override
 	public String toString() {
 		return "User [email=" + email + "]";
@@ -59,6 +63,10 @@ public class User {
 		return this.password.equals(_password);
 	}
 	
+	public void setPassword(String _password) {
+		this.password = _password;
+	}
+	
 	public Date getEmailConfirmed() {
 		return this.emailConfirmed;
 	}
@@ -77,6 +85,7 @@ public class User {
 	
 	public void addOAuth(OAuth _oauth) {
 		this.oauths.add(_oauth);
+		_oauth.setUser(this);
 	}
 	
 	public void removeOAuth(OAuth _oauth) {
