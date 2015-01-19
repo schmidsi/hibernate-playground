@@ -24,8 +24,26 @@ public class Hostname {
 		this.redirectTo.addRedirect(this);
 	}
 	
+	public boolean equals(Object obj) {
+		if (obj instanceof Hostname) {
+			Hostname comp = (Hostname) obj;
+			
+			return comp.getHostname().equals(this.name); 
+		} else {
+			return false;
+		}
+	}
+	
 	public void addRedirect(Hostname hostname) {
 		this.redirecting.add(hostname);
+	}
+	
+	public void setRedirectTo(Hostname hostname) {
+		this.redirectTo = hostname;
+	}
+	
+	public Hostname getRedirect() {
+		return redirectTo;
 	}
 	
 	public void setHostname(String name) {

@@ -18,6 +18,12 @@ public class User {
 		this.password = _password;
 	}
 	
+	@Override
+	public String toString() {
+		return "User [email=" + email
+				+ ", emailConfirmed=" + emailConfirmed + "]";
+	}
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
