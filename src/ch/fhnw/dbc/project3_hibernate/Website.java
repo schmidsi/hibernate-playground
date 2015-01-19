@@ -12,7 +12,10 @@ public class Website {
 	@GeneratedValue
 	private int id;
 	
-	@ManyToOne()
+	private String title;
+	
+	@OneToOne
+	@PrimaryKeyJoinColumn
 	private Hostname hostname;
 	
 	@OneToMany(targetEntity=Access.class, mappedBy="target",
@@ -21,9 +24,36 @@ public class Website {
 	
 	public Website() {};
 	
-	public Website(Hostname _hostname, User _owner) {
-		this.setHostname(_hostname);
+	public Website(String _title, Hostname _hostname, User _owner) {
+		this.title = _title;
+		
+		if (_hostname.getRedirect() != null) {
+			this.setHostname(_hostname.getRedirect());
+		} else {
+			this.setHostname(_hostname);
+		}
+		
 		this.addAccess(new Access(this, _owner, Role.OWN));
+	}
+	
+	public String render() {
+		return "<html><title>" + this.getTitle() + "</title></html>";
+	}
+	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+	
+	public String getTitle() {
+		return this.title;
+	}
+	
+	public void setTitle(String _title) {
+		this.title = _title;
 	}
 	
 	public void addAccess(Access access) {
@@ -36,5 +66,6 @@ public class Website {
 
 	public void setHostname(Hostname hostname) {
 		this.hostname = hostname;
+		hostname.setWebsite(this);
 	}
 }

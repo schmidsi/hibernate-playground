@@ -17,6 +17,9 @@ public class Hostname {
 	private String name;
 	private Date created;
 	
+	@OneToOne(mappedBy="hostname", cascade=CascadeType.ALL)
+	private Website website;
+	
 	@ManyToOne()
 	private Hostname redirectTo;
 	
@@ -77,6 +80,14 @@ public class Hostname {
 	
 	public Date getCreated() {
 		return this.created;
+	}
+
+	public Website getWebsite() {
+		return website;
+	}
+
+	public void setWebsite(Website website) {
+		this.website = website;
 	}
 	
 }
