@@ -2,8 +2,6 @@ package ch.fhnw.dbc.project3_hibernate;
 
 import static org.junit.Assert.*;
 
-import java.util.List;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
