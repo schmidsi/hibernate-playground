@@ -47,6 +47,14 @@ public class Hostname {
 		}
 	}
 	
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+	
 	public void addRedirect(Hostname hostname) {
 		this.redirecting.add(hostname);
 	}

@@ -39,6 +39,14 @@ public class User {
 		return "User [email=" + email + "]";
 	}
 
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
