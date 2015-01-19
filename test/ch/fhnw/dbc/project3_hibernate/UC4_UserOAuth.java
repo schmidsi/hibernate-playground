@@ -7,6 +7,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Example;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -115,6 +116,12 @@ public class UC4_UserOAuth {
 		assertNull(userDeleted);
 		assertNull(oauth1);
 		assertNull(oauth2);
+	}
+	
+	@AfterClass
+	public static void clear() {
+		session.close();
+		sessionFactory.close();
 	}
 
 }

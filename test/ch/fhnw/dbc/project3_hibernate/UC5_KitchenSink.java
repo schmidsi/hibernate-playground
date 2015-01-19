@@ -8,6 +8,7 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Example;
 import org.hibernate.criterion.Restrictions;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -114,5 +115,10 @@ public class UC5_KitchenSink {
 		assertNull(oauthDeleted);
 		assertNull(hostnameDeleted);
 	}
-
+	
+	@AfterClass
+	public static void clear() {
+		session.close();
+		sessionFactory.close();
+	}
 }

@@ -7,6 +7,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Example;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -61,6 +62,12 @@ public class UC3_CreateUserEmailPassword {
 			Example.create(new User("example.com", "")).excludeProperty("password")).uniqueResult();
 		
 		assertNull(checkuser);
+	}
+	
+	@AfterClass
+	public static void clear() {
+		session.close();
+		sessionFactory.close();
 	}
 
 }

@@ -6,6 +6,7 @@ import org.hibernate.*;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -89,5 +90,11 @@ public class UC1_DomainRegistration {
 		
 		assertNull(domainFromHibernate);
 		assertNull(userFromHibernate);
+	}
+	
+	@AfterClass
+	public static void clear() {
+		session.close();
+		sessionFactory.close();
 	}
 }
