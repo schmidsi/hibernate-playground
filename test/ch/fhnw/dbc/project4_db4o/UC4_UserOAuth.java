@@ -2,51 +2,38 @@ package ch.fhnw.dbc.project4_db4o;
 
 import static org.junit.Assert.*;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.criterion.Example;
+import java.io.File;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import com.db4o.Db4oEmbedded;
+import com.db4o.ObjectContainer;
+import com.db4o.ObjectSet;
+
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UC4_UserOAuth {
-	static SessionFactory sessionFactory;
-	static Session session;
+	static ObjectContainer db;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		Configuration configuration = new Configuration();
-		configuration.configure("/hibernate.cfg.xml");
-		sessionFactory = configuration.buildSessionFactory(new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build());
-		session = sessionFactory.openSession();
+		db = Db4oEmbedded.openFile("db.db4o");
 	}
-
 
 	@Test
 	public void test01_CreateUserByOAuth() {
 		OAuth oauth = new OAuth(OAuthProvider.FACEBOOK, "12356", "ASDFB"); 
 		User user = new User(oauth);
 		
-		assertTrue(user.getId() == 0);
-		assertTrue(oauth.getId() == 0);
-		
-		session.beginTransaction();
-		session.save(oauth);
-		session.save(user);
-		session.getTransaction().commit();
-		
-		assertFalse(user.getId() == 0);
-		assertFalse(oauth.getId() == 0);
+		db.store(user);
 	}
 	
 	@Test
 	public void test02_LookupUserByOAuth() {
-		OAuth oauth = (OAuth) session.createCriteria(OAuth.class).add(
-			Example.create(new OAuth(OAuthProvider.FACEBOOK, "12356"))).uniqueResult();
+		ObjectSet<OAuth> q = db.query(OAuth.class);
+		OAuth oauth = q.get(0);
 		
 		assertNotNull(oauth);
 		assertNotNull(oauth.getUser());
@@ -54,41 +41,35 @@ public class UC4_UserOAuth {
 	
 	@Test
 	public void test03_SetLateEmailPassword() {
-		OAuth oauth = (OAuth) session.createCriteria(OAuth.class).add(
-			Example.create(new OAuth(OAuthProvider.FACEBOOK, "12356"))).uniqueResult();
+		ObjectSet<OAuth> q = db.query(OAuth.class);
+		OAuth oauth = q.get(0);
 		User user = oauth.getUser();
 		
 		user.setEmail("test@example.com");
 		user.setPassword("password");
-		
-		session.beginTransaction();
-		session.save(user);
-		session.getTransaction().commit();
+	
+		db.store(user);
 		
 		assertTrue(user.checkPassword("password"));
 	}
 	
 	@Test
 	public void test04_SecondOAuth() {
-		User user = (User) session.createCriteria(User.class).add(
-			Example.create(new User("test@example.com", "")).excludeProperty("password")).uniqueResult();
+		ObjectSet<User> q = db.query(User.class);
+		User user = q.get(0);
 		OAuth oauth = new OAuth(OAuthProvider.TWITTER, "76532", "QWRE");
 		
 		user.addOAuth(oauth);
 		
-		assertTrue(oauth.getId() == 0);
-		
-		session.beginTransaction();
-		session.save(user);
-		session.getTransaction().commit();
-		
-		assertFalse(oauth.getId() == 0);
+		db.store(user);
+		db.store(oauth);
 	}
 	
 	@Test
 	public void test05_LookupSecondOAuth() {
-		OAuth oauth = (OAuth) session.createCriteria(OAuth.class).add(
-			Example.create(new OAuth(OAuthProvider.TWITTER, "76532"))).uniqueResult();
+		ObjectSet<OAuth> q = db.query(OAuth.class);
+		
+		OAuth oauth = q.get(1);
 		User user = oauth.getUser();
 		
 		assertNotNull(user);
@@ -97,24 +78,30 @@ public class UC4_UserOAuth {
 	
 	@Test
 	public void test06_DeleteAll() {
-		OAuth oauth = (OAuth) session.createCriteria(OAuth.class).add(
-			Example.create(new OAuth(OAuthProvider.TWITTER, "76532"))).uniqueResult();
+		ObjectSet<OAuth> q = db.query(OAuth.class);
+		OAuth oauth = q.get(1);
 		User user = oauth.getUser();
 		
-		session.beginTransaction();
-		session.delete(user);
-		session.getTransaction().commit();
+		db.delete(user);
 		
-		User userDeleted = (User) session.createCriteria(User.class).add(
-			Example.create(new User("test@example.com", "")).excludeProperty("password")).uniqueResult();
-		OAuth oauth1 = (OAuth) session.createCriteria(OAuth.class).add(
-				Example.create(new OAuth(OAuthProvider.TWITTER, "76532"))).uniqueResult();
-		OAuth oauth2 = (OAuth) session.createCriteria(OAuth.class).add(
-				Example.create(new OAuth(OAuthProvider.FACEBOOK, "12356"))).uniqueResult();
-	
-		assertNull(userDeleted);
-		assertNull(oauth1);
-		assertNull(oauth2);
+		for (OAuth oa: q) db.delete(oa);
+		
+		ObjectSet<User> qu = db.query(User.class);
+		ObjectSet<OAuth> qo = db.query(OAuth.class);
+		
+		assertTrue(qu.size() == 0);
+		assertTrue(qo.size() == 0);
 	}
-
+	
+	@AfterClass
+	public static void clear() {
+		db.close();
+		
+		try {
+			File file = new File("db.db4o");
+			file.delete();
+		} catch(Exception ex) {
+			System.out.println(ex);
+		}
+	}
 }

@@ -3,16 +3,10 @@ package ch.fhnw.dbc.project4_db4o;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
 
-
-@Entity
 public class Domain extends Hostname {
-	@OneToMany(targetEntity=Subdomain.class, mappedBy="domain",
-			cascade=CascadeType.ALL, fetch=FetchType.LAZY )
 	private List<Subdomain> subdomains = new ArrayList<Subdomain>();
 	
-	@ManyToOne()
 	private User owner;
 
 	public Domain() {}

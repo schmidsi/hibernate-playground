@@ -3,23 +3,14 @@ package ch.fhnw.dbc.project4_db4o;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
 
-
-@Entity
 public class Website {
-	@Id
-	@GeneratedValue
 	private int id;
 	
 	private String title;
 	
-	@OneToOne
-	@PrimaryKeyJoinColumn
 	private Hostname hostname;
 	
-	@OneToMany(targetEntity=Access.class, mappedBy="target",
-			cascade=CascadeType.ALL, fetch=FetchType.LAZY )
 	private List<Access> access = new ArrayList<Access>();
 	
 	public Website() {};

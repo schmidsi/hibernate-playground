@@ -4,34 +4,21 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.*;
 
-
-@Entity
-@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
 public class Hostname {
-	@Id
-	@GeneratedValue
 	private int id;
 	
 	private String name;
-	private Date created;
 	
-	@OneToOne(mappedBy="hostname", cascade=CascadeType.ALL)
 	private Website website;
-	
-	@ManyToOne()
 	private Hostname redirectTo;
-	
-	@OneToMany(targetEntity=Hostname.class, mappedBy="redirectTo",
-			cascade=CascadeType.ALL, fetch=FetchType.LAZY )
+
 	private List<Hostname> redirecting = new ArrayList<Hostname>();
 	
 	public Hostname() {}
 	
 	public Hostname(String _name) {
 		this.name = _name;
-		this.created = new Date();
 	}
 	
 	public Hostname(String _name, Hostname _redirectTo) {
@@ -76,10 +63,6 @@ public class Hostname {
 	
 	public String getHostname() {
 		return this.name;
-	}
-	
-	public Date getCreated() {
-		return this.created;
 	}
 
 	public Website getWebsite() {

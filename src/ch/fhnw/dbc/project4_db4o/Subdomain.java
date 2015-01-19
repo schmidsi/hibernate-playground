@@ -1,11 +1,7 @@
 package ch.fhnw.dbc.project4_db4o;
 
-import javax.persistence.*;
 
-
-@Entity
 public class Subdomain extends Hostname {
-	@ManyToOne
 	private Domain domain;
 	
 	public Subdomain() {}

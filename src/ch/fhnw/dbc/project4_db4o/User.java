@@ -4,26 +4,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.*;
 
-
-@Entity
-@Table(name="AppUser")
 public class User {
-	@Id
-	@GeneratedValue
 	private int id;
 	
 	private String password;
 	private String email;
 	private Date emailConfirmed;
 	
-	@OneToMany(targetEntity=Access.class, mappedBy="actor",
-			cascade=CascadeType.ALL, fetch=FetchType.LAZY )
 	private List<Access> access = new ArrayList<Access>();
 	
-	@OneToMany(targetEntity=OAuth.class, mappedBy="user",
-			cascade=CascadeType.ALL, fetch=FetchType.LAZY )
 	private List<OAuth> oauths = new ArrayList<OAuth>();
 	
 	public User(){};

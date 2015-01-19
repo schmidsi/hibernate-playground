@@ -2,28 +2,26 @@ package ch.fhnw.dbc.project4_db4o;
 
 import static org.junit.Assert.*;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.criterion.Example;
-import org.hibernate.criterion.Restrictions;
+import java.io.File;
+
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+import com.db4o.Db4oEmbedded;
+import com.db4o.ObjectContainer;
+import com.db4o.ObjectSet;
+
+
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UC5_KitchenSink {
-	static SessionFactory sessionFactory;
-	static Session session;
+	static ObjectContainer db;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		Configuration configuration = new Configuration();
-		configuration.configure("/hibernate.cfg.xml");
-		sessionFactory = configuration.buildSessionFactory(new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build());
-		session = sessionFactory.openSession();
+		db = Db4oEmbedded.openFile("db.db4o");
 	}
 
 	@Test
@@ -31,54 +29,29 @@ public class UC5_KitchenSink {
 		OAuth oauth = new OAuth(OAuthProvider.FACEBOOK, "12356", "ASDFB"); 
 		User user1 = new User(oauth);
 		User user2 = new User("test@example.com", "password");
-		
-		assertTrue(user1.getId() == 0);
-		assertTrue(user2.getId() == 0);
-		assertTrue(oauth.getId() == 0);
-		
-		session.beginTransaction();
-		session.save(oauth);
-		session.save(user1);
-		session.save(user2);
-		session.getTransaction().commit();
-		
-		assertFalse(user1.getId() == 0);
-		assertFalse(user2.getId() == 0);
-		assertFalse(oauth.getId() == 0);
+	
+		db.store(user1);
+		db.store(user2);
 	}
 	
 	@Test
 	public void test02_CreateWebsite() {
-		OAuth oauth = (OAuth) session.createCriteria(OAuth.class).add(
-			Example.create(new OAuth(OAuthProvider.FACEBOOK, "12356"))).uniqueResult();
+		OAuth oauth = db.query(OAuth.class).get(0);
 		
 		Domain domain = new Domain("example.com", oauth.getUser());
 		Website website = new Website("Kitchen Sink", domain, oauth.getUser());
 		
-		assertTrue(domain.getId() == 0);
-		assertTrue(website.getId() == 0);
-		
-		session.beginTransaction();
-		session.save(domain);
-		session.save(website);
-		session.getTransaction().commit();
-		
-		assertFalse(domain.getId() == 0);
-		assertFalse(website.getId() == 0);
+		db.store(website);
 	}
 	
 	@Test
 	public void test03_AuthorizeEditor() {
-		Website website = (Website) session.createCriteria(Website.class)
-				.add(Restrictions.eq("title", "Kitchen Sink")).uniqueResult();
-		User user = (User) session.createCriteria(User.class).add(
-				Example.create(new User("test@example.com", "")).excludeProperty("password")).uniqueResult();
+		Website website = db.query(Website.class).get(0);
+		User user = db.query(User.class).get(0);
 		
 		website.addAccess(new Access(website, user, Role.READWRITE));
 		
-		session.beginTransaction();
-		session.saveOrUpdate(website);
-		session.getTransaction().commit();
+		db.store(website);
 		
 		assertTrue(website.hasAccess(user, Role.READWRITE));
 		assertNotNull(user.getAccess().get(0));
@@ -86,8 +59,7 @@ public class UC5_KitchenSink {
 	
 	@Test
 	public void test04_LookupByUser() {
-		User user = (User) session.createCriteria(User.class).add(
-			Example.create(new User("test@example.com", "")).excludeProperty("password")).uniqueResult();
+		User user = db.query(User.class).get(0);
 		
 		assertNotNull(user);
 		assertNotNull(user.getAccess().get(0));
@@ -95,24 +67,37 @@ public class UC5_KitchenSink {
 		assertEquals(user.getAccess().get(0).getTarget().getHostname().getHostname(), "www.example.com");
 	}
 	
+	@Test
 	public void test05_cleanup() {
-		Website website = (Website) session.createCriteria(Website.class)
-			.add(Restrictions.eq("title", "Kitchen Sink")).uniqueResult();
+		Website website = db.query(Website.class).get(0);
+		OAuth oauth = db.query(OAuth.class).get(0);
+		ObjectSet<User> users = db.query(User.class);
+		ObjectSet<Hostname> hostnames = db.query(Hostname.class);
 		
-		session.beginTransaction();
-		session.delete(website);
-		session.getTransaction().commit();
 		
-		User userDeleted = (User) session.createCriteria(User.class).add(
-			Example.create(new User("test@example.com", "")).excludeProperty("password")).uniqueResult();
-		OAuth oauthDeleted = (OAuth) session.createCriteria(OAuth.class).add(
-			Example.create(new OAuth(OAuthProvider.FACEBOOK, "12356"))).uniqueResult();
-		Hostname hostnameDeleted = (Hostname) session.createCriteria(Hostname.class).add(
-			Example.create(new Hostname("example.com")).excludeProperty("created")).uniqueResult();
+		db.delete(website);
+		db.delete(oauth);
+		for (User u: users) db.delete(u);
+		for (Hostname h: hostnames) db.delete(h);
 		
-		assertNull(userDeleted);
-		assertNull(oauthDeleted);
-		assertNull(hostnameDeleted);
+		ObjectSet<User> userDeleted = db.query(User.class);
+		ObjectSet<OAuth> oauthDeleted = db.query(OAuth.class);
+		ObjectSet<Hostname> hostnameDeleted = db.query(Hostname.class);
+		
+		assertTrue(userDeleted.size() == 0);
+		assertTrue(oauthDeleted.size() == 0);
+		assertTrue(hostnameDeleted.size() == 0);
 	}
-
+	
+	@AfterClass
+	public static void clear() {
+		db.close();
+		
+		try {
+			File file = new File("db.db4o");
+			file.delete();
+		} catch(Exception ex) {
+			System.out.println(ex);
+		}
+	}
 }

@@ -1,18 +1,11 @@
 package ch.fhnw.dbc.project4_db4o;
 
-import javax.persistence.*;
 
-
-@Entity
 public class Access {
-	@Id
-	@GeneratedValue
 	private int id;
 	
-	@ManyToOne()
 	private Website target;
 	
-	@ManyToOne()
 	private User actor;
 	
 	private Role role;

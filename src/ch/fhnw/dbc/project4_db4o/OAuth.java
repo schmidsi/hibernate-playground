@@ -1,15 +1,9 @@
 package ch.fhnw.dbc.project4_db4o;
 
-import javax.persistence.*;
 
-
-@Entity
 public class OAuth {
-	@Id
-	@GeneratedValue
 	private int id;
 	
-	@ManyToOne()
 	private User user;
 	
 	private OAuthProvider provider;
