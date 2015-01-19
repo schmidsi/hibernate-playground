@@ -56,8 +56,19 @@ public class Website {
 		this.title = _title;
 	}
 	
-	public void addAccess(Access access) {
-		this.access.add(access);
+	public void addAccess(Access _access) {
+		this.access.add(_access);
+		_access.getActor().addAccess(_access);
+	}
+	
+	public boolean hasAccess(User _user, Role _role) {
+		for (Access a: this.access) {
+			if (a.getActor().equals(_user) && a.getRole().equals(_role)) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	public Hostname getHostname() {

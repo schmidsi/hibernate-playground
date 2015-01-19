@@ -14,7 +14,6 @@ public class User {
 	@GeneratedValue
 	private int id;
 	
-	
 	private String password;
 	private String email;
 	private Date emailConfirmed;
@@ -81,6 +80,16 @@ public class User {
 	
 	public void removeAccess(Access _access) {
 		this.access.remove(_access);
+	}
+	
+	public List<Access> getAccess() {
+		ArrayList<Access> al = new ArrayList<Access>();
+		
+		for (Access a: this.access) {
+			al.add(a);
+		}
+		
+		return (List<Access>) al;
 	}
 	
 	public void addOAuth(OAuth _oauth) {
