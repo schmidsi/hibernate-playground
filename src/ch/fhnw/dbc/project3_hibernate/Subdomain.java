@@ -1,7 +1,13 @@
 package ch.fhnw.dbc.project3_hibernate;
 
-public class Subdomain extends Hostname {
+import javax.persistence.*;
 
+
+@Entity
+public class Subdomain extends Hostname {
+	@ManyToOne
+	private Domain domain;
+	
 	public Subdomain() {}
 
 	public Subdomain(String _name) {

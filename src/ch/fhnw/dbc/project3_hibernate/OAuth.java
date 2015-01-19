@@ -1,9 +1,19 @@
 package ch.fhnw.dbc.project3_hibernate;
 
+import javax.persistence.*;
+
+
+@Entity
 public class OAuth {
+	@Id
+	@GeneratedValue
+	private int id;
+	
+	@ManyToOne()
 	private User user;
+	
 	private OAuthProvider provider;
-	private String id;
+	private String providerId;
 	private String accessToken;
 	
 	public OAuth() {};
@@ -11,7 +21,7 @@ public class OAuth {
 	public OAuth(User _user, OAuthProvider _provider, String _id, String _accessToken) {
 		this.user = _user;
 		this.provider = _provider;
-		this.id = _id;
+		this.providerId = _id;
 		this.accessToken = _accessToken;
 	}
 
@@ -31,12 +41,12 @@ public class OAuth {
 		this.provider = provider;
 	}
 
-	public String getId() {
-		return id;
+	public String getProviderId() {
+		return providerId;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setProviderId(String id) {
+		this.providerId = id;
 	}
 
 	public String getAccessToken() {

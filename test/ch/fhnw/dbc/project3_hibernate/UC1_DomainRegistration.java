@@ -2,6 +2,10 @@ package ch.fhnw.dbc.project3_hibernate;
 
 import static org.junit.Assert.*;
 
+import org.hibernate.*;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,6 +33,20 @@ public class UC1_DomainRegistration {
 		assertTrue(wwwSubdomain.getHostname().equals("www.example.com"));
 		assertTrue(domain.getRedirect().equals(wwwSubdomain));
 		assertTrue(domain.hasAccess(user, Role.OWN));
+	}
+	
+	@Test
+	public void testHibernate() {
+		Configuration configuration = new Configuration();
+		configuration.configure("/hibernate.cfg.xml");
+		SessionFactory sessionFactory = configuration.buildSessionFactory(new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build());
+		Session session = sessionFactory.openSession();
+		session.beginTransaction();
+		
+		session.save(user);
+		session.save(domain);
+		
+		session.getTransaction().commit();
 	}
 
 }

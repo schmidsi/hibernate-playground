@@ -1,17 +1,26 @@
 package ch.fhnw.dbc.project3_hibernate;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class Domain extends Hostname implements AccessControllable {	
-	private ArrayList<Subdomain> subdomains = new ArrayList<Subdomain>();
-	private ArrayList<Access> access = new ArrayList<Access>();
+import javax.persistence.*;
+
+
+@Entity
+public class Domain extends Hostname {
+	@OneToMany(targetEntity=Subdomain.class, mappedBy="domain",
+			cascade=CascadeType.ALL, fetch=FetchType.LAZY )
+	private List<Subdomain> subdomains = new ArrayList<Subdomain>();
+	
+	@ManyToOne()
+	private User owner;
 
 	public Domain() {}
 
 	public Domain(String _name, User _owner) {
 		super(_name);
 		
-		this.addAccess(new Access(this, _owner, Role.OWN));
+		this.owner = _owner;
 		this.addSubdomain(new Subdomain("www." + _name));
 		this.setRedirectTo(this.getSubdomain(0));
 	}
@@ -20,19 +29,9 @@ public class Domain extends Hostname implements AccessControllable {
 	public String toString() {
 		return "Domain [getHostname()=" + getHostname() + "]";
 	}
-
-	public void addAccess(Access access) {
-		this.access.add(access);
-	}
 	
 	public boolean hasAccess(User user, Role role) {
-		for (Access a: this.access) {
-			if (a.getActor().equals(user) && a.getRole().equals(role)) {
-				return true;
-			}
-		}
-		
-		return false;
+		return (this.owner.equals(user) && role == Role.OWN);
 	}
 	
 	public void addSubdomain(Subdomain subdomain) {

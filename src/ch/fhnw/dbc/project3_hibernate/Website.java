@@ -1,11 +1,23 @@
 package ch.fhnw.dbc.project3_hibernate;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class Website implements AccessControllable {
+import javax.persistence.*;
+
+
+@Entity
+public class Website {
+	@Id
+	@GeneratedValue
+	private int id;
+	
+	@ManyToOne()
 	private Hostname hostname;
 	
-	private ArrayList<Access> access = new ArrayList<Access>();
+	@OneToMany(targetEntity=Access.class, mappedBy="target",
+			cascade=CascadeType.ALL, fetch=FetchType.LAZY )
+	private List<Access> access = new ArrayList<Access>();
 	
 	public Website() {};
 	

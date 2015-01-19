@@ -2,14 +2,27 @@ package ch.fhnw.dbc.project3_hibernate;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.*;
+
+
+@Entity
+@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
 public class Hostname {
+	@Id
+	@GeneratedValue
+	private int id;
+	
 	private String name;
 	private Date created;
 	
+	@ManyToOne()
 	private Hostname redirectTo;
 	
-	private ArrayList<Hostname> redirecting = new ArrayList<Hostname>();
+	@OneToMany(targetEntity=Hostname.class, mappedBy="redirectTo",
+			cascade=CascadeType.ALL, fetch=FetchType.LAZY )
+	private List<Hostname> redirecting = new ArrayList<Hostname>();
 	
 	public Hostname() {}
 	
